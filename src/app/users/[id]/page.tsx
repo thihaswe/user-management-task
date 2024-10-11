@@ -1,115 +1,131 @@
 "use client";
-import React from "react";
-import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { fetchUserDetail } from "../../../utils/api";
-import { User } from "../../../types/index";
+import InfoCard from "@/components/InfoCard";
+import Loading from "@/components/Loading";
+import { useUser } from "@/hooks/useUsers";
+import { Address, Bank, Company, Coordinates, Crypto, User } from "@/types";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
+  Box,
   Card,
   CardContent,
+  Collapse,
+  Divider,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
-  CircularProgress,
-  Grid,
 } from "@mui/material";
-import {
-  Email as EmailIcon,
-  Phone as PhoneIcon,
-  Home as HomeIcon,
-  Business as BusinessIcon,
-  School as SchoolIcon,
-  AccountCircle as AccountCircleIcon,
-} from "@mui/icons-material";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import React, { useState } from "react";
 
 const UserDetail: React.FC = () => {
   const params = useParams();
   const id = Number(params.id);
 
-  const { data, isLoading } = useQuery<User | undefined>({
-    queryKey: ["user", id],
-    queryFn: () => fetchUserDetail(id),
-    enabled: !!id,
+  const { data, isLoading, isError, error } = useUser(id);
+
+  const [expandedSections, setExpandedSections] = useState<
+    Record<string, boolean>
+  >({
+    biography: true,
+    address: true,
+    company: true,
+    finance: true,
   });
 
-  if (isLoading) return <CircularProgress />;
+  const handleToggle = (section: string) => {
+    setExpandedSections((prev: Record<string, boolean>) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
 
-  const address = data?.address
-    ? `${data.address.address}, ${data.address.city}, ${data.address.state}, ${data.address.postalCode}, ${data.address.country}`
-    : "Address not available";
+  if (isLoading) return <Loading />;
+  if (isError)
+    return (
+      <Box>
+        404 not found:
+        {error.message}
+      </Box>
+    );
+
+  if (data === undefined) {
+    return <Box>no data found</Box>;
+  }
+
+  const { company, address, bank, crypto, ...rest } = data;
 
   return (
     <div style={{ display: "flex", justifyContent: "center", margin: "20px" }}>
-      <Card style={{ maxWidth: 600, width: "100%" }}>
+      <Card style={{ maxWidth: 800, width: "100%" }}>
         <CardContent>
           <Typography variant="h4" gutterBottom>
             {`${data?.firstName} ${data?.lastName}`}
           </Typography>
-          <img
-            src={data?.image}
+          <Image
+            src={data?.image || ""}
             alt={`${data?.firstName} ${data?.lastName}`}
+            width={128}
+            height={128}
             style={{
-              width: "128px",
               borderRadius: "50%",
               marginBottom: "20px",
             }}
           />
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <AccountCircleIcon fontSize="small" />
-                <strong>Username:</strong> {data?.username}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <EmailIcon fontSize="small" /> <strong>Email:</strong>
-                {data?.email}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <PhoneIcon fontSize="small" /> <strong>Phone:</strong>
-                {data?.phone || "Phone not available"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <HomeIcon fontSize="small" /> <strong>Address:</strong>
-                {address}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <SchoolIcon fontSize="small" /> <strong>University:</strong>
-                {data?.university || "N/A"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <BusinessIcon fontSize="small" /> <strong>Company:</strong>
-                {data?.company?.name || "N/A"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <strong>Gender:</strong> {data?.gender}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <strong>Age:</strong> {data?.age}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <strong>Birth Date:</strong> {data?.birthDate}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" color="textSecondary">
-                <strong>Blood Group:</strong> {data?.bloodGroup}
-              </Typography>
-            </Grid>
-          </Grid>
+
+          {/* personal information Section */}
+          {}
+          <Divider sx={{ my: 2 }} />
+
+          {/* Address Section */}
+          {address && (
+            <InfoCard
+              prop={{
+                handlePara: "address",
+                handleToggle,
+                section: expandedSections.address,
+                header: "Address",
+                userInfo: address,
+              }}
+            />
+          )}
+
+          <Divider sx={{ my: 2 }} />
+          {/* Company Section */}
+
+          {company && (
+            <InfoCard
+              prop={{
+                handlePara: "company",
+                handleToggle,
+                section: expandedSections.company,
+                header: "Company",
+                userInfo: company,
+                additional: company.address,
+              }}
+            />
+          )}
+          <Divider sx={{ my: 2 }} />
+
+          {/* Finance Section */}
+
+          {bank && (
+            <InfoCard
+              prop={{
+                handlePara: "finance",
+                handleToggle,
+                section: expandedSections.finance,
+                header: "Bank",
+                userInfo: bank,
+              }}
+            />
+          )}
         </CardContent>
       </Card>
     </div>

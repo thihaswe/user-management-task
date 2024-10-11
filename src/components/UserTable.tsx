@@ -31,6 +31,7 @@ const UserTable: React.FC<UserTableProps> = ({ users }) => {
             <TableCell style={{ border: "1px solid #ddd" }}>Name</TableCell>
             <TableCell style={{ border: "1px solid #ddd" }}>Email</TableCell>
             <TableCell style={{ border: "1px solid #ddd" }}>Age</TableCell>
+            <TableCell style={{ border: "1px solid #ddd" }}>Gender</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -51,6 +52,9 @@ const UserTable: React.FC<UserTableProps> = ({ users }) => {
               </TableCell>
               <TableCell style={{ border: "1px solid #ddd" }}>
                 {user.age}
+              </TableCell>
+              <TableCell style={{ border: "1px solid #ddd" }}>
+                {user.gender}
               </TableCell>
             </TableRow>
           ))}

@@ -3,32 +3,41 @@ import React, { useState } from "react";
 import { useUsers } from "../../hooks/useUsers";
 import UserTable from "../../components/UserTable";
 import Pagination from "../../components/Pagination";
-import { Typography } from "@mui/material";
-import { User } from "@/types";
+import {
+  Box,
+  Button,
+  Input,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { Filter, User } from "@/types";
 import SearchIcon from "@mui/icons-material/Search";
+import Loading from "@/components/Loading";
+import { FormControl } from "@mui/material";
+import UserFIlter from "@/components/UserFIlter";
 
 const UsersPage = () => {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setfilter] = useState<{
-    limit: number;
-    skip: number;
-    sortBy: string;
-    order: string;
-  }>({
+  const [filter, setfilter] = useState<Filter>({
     limit: 0,
     skip: 0,
     sortBy: "",
     order: "",
   });
 
-  // Pagination limit
-  const pageLimit = 10;
-
   // Fetch users with the specified limit and skip
 
   const { limit, skip, sortBy, order } = filter;
-  const { data, isLoading } = useUsers(limit, skip, sortBy, order);
+  const { data, isLoading, isError, error } = useUsers(
+    limit,
+    skip,
+    sortBy,
+    order
+  );
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -37,10 +46,14 @@ const UsersPage = () => {
   // Filter users based on the search term
   const filteredUsers: User[] =
     //@ts-ignore
-    data?.users.filter((user: User) => {
+    data?.filter((user: User) => {
       const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
       return fullName.includes(searchTerm.toLowerCase());
     }) || [];
+
+  // Calculate total pages based on filtered users
+  const pageLimit = 10;
+  const totalFilteredPages = Math.ceil(filteredUsers.length / pageLimit);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,14 +68,18 @@ const UsersPage = () => {
 
     setfilter({ limit, skip, sortBy, order });
   };
-  // Calculate total pages based on filtered users
-  const totalFilteredPages = Math.ceil(filteredUsers.length / pageLimit);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />;
+  if (isError)
+    return (
+      <Box>
+        <Box>{error.message}</Box>
+      </Box>
+    );
 
   return (
-    <div>
-      <input
+    <Box>
+      <Input
         type="text"
         placeholder="Search by name"
         value={searchTerm}
@@ -70,47 +87,13 @@ const UsersPage = () => {
           setSearchTerm(e.target.value);
           setPage(1);
         }}
-        style={{ marginBottom: "20px", padding: "8px", width: "300px" }}
+        sx={{ marginBottom: "20px", padding: "8px", width: "300px" }}
       />
-      <form onSubmit={handleSearch}>
-        <input
-          defaultValue={filter.limit}
-          type="number"
-          placeholder="Set user limit"
-          name="limit"
-          style={{ marginBottom: "20px", padding: "8px", maxWidth: "300px" }}
-        />
-        <input
-          defaultValue={filter.skip}
-          type="number"
-          placeholder="Set user limit"
-          name="skip"
-          style={{ marginBottom: "20px", padding: "8px", maxWidth: "300px" }}
-        />
-        <select
-          defaultValue={filter.sortBy}
-          name="sortBy"
-          style={{ marginBottom: "20px", padding: "8px" }}
-        >
-          <option value="">Sort By</option>
-          <option value="firstName">First Name</option>
-          <option value="lastName">Last Name</option>
-        </select>
-
-        <select
-          defaultValue={filter.order}
-          name="order"
-          style={{ marginBottom: "20px", padding: "8px" }}
-        >
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
-        </select>
-
-        <button style={{ padding: "8px 16px", marginLeft: "10px" }}>
-          <SearchIcon sx={{ fontSize: 15 }} />
-        </button>
-      </form>
-
+      <UserFIlter
+        filter={filter}
+        setfilter={setfilter}
+        handleSearch={handleSearch}
+      />
       {filteredUsers.length > 0 ? (
         <>
           <UserTable
@@ -128,7 +111,7 @@ const UsersPage = () => {
       ) : (
         <Typography>No users found</Typography>
       )}
-    </div>
+    </Box>
   );
 };
 

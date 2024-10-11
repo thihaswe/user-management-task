@@ -7,11 +7,11 @@ interface PaginationProps {
   onPageChange: (newPage: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({
+const Pagination = ({
   currentPage,
   totalPages,
   onPageChange,
-}) => {
+}: PaginationProps) => {
   // Determine the range of pages to display
   const getPageNumbers = () => {
     const pageNumbers = [];

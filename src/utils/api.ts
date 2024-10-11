@@ -13,10 +13,11 @@ export const fetchUsers = async (
       ? `${BASE_URL}?limit=${limit}&skip=${skip}&sortBy=${sortBy}&order=${order}`
       : `${BASE_URL}?limit=${limit}&skip=${skip}`
   );
-  return response.data;
+  return response.data.users;
 };
 
 export const fetchUserDetail = async (id: number) => {
   const response = await axios.get(`${BASE_URL}/${id}`);
+
   return response.data;
 };
