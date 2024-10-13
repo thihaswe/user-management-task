@@ -24,23 +24,22 @@ import React, { useState } from "react";
 
 interface Prop {
   handleToggle: (para: string) => void;
-  handlePara: string;
+  section: string;
   header: string;
-  section: boolean;
-  userInfo: User | Company | Address | Bank;
-  additional?: Address | Crypto;
+  onOff: boolean;
+  userInfo: User | Company | Address | Bank | Crypto;
+  additional?: Address;
 }
 
 const InfoCard = ({ prop }: { prop: Prop }) => {
-  const { handleToggle, handlePara, header, section, userInfo, additional } =
-    prop;
+  const { handleToggle, section, header, onOff, userInfo, additional } = prop;
   return (
     <Box>
       <Box style={{ display: "flex", alignItems: "center" }}>
-        <IconButton onClick={() => handleToggle(handlePara)}>
+        <IconButton onClick={() => handleToggle(section)}>
           <ExpandMoreIcon
             sx={{
-              transform: section ? "rotate(180deg)" : "rotate(0deg)",
+              transform: onOff ? "rotate(180deg)" : "rotate(0deg)",
               transition: "transform 0.3s ease",
             }}
           />
@@ -49,7 +48,7 @@ const InfoCard = ({ prop }: { prop: Prop }) => {
           {header}
         </Typography>
       </Box>
-      <Collapse in={section}>
+      <Collapse in={onOff}>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -63,6 +62,7 @@ const InfoCard = ({ prop }: { prop: Prop }) => {
               </TableRow>
             </TableHead>
             <TableBody>
+              {/* {main data like personal info,address,company,bank} */}
               {Object.entries(userInfo).map(([key, value]) => {
                 if (typeof value !== "object" && value !== null) {
                   return (
@@ -106,7 +106,7 @@ const InfoCard = ({ prop }: { prop: Prop }) => {
 
                 return null;
               })}
-
+              {/* {additional for company address} */}
               {additional &&
                 Object.entries(additional).map(([key, value]) => {
                   if (

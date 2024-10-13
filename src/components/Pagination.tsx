@@ -1,17 +1,13 @@
 import React from "react";
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
-interface PaginationProps {
+interface Prop {
   currentPage: number;
   totalPages: number;
   onPageChange: (newPage: number) => void;
 }
 
-const Pagination = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: PaginationProps) => {
+const Pagination = ({ currentPage, totalPages, onPageChange }: Prop) => {
   // Determine the range of pages to display
   const getPageNumbers = () => {
     const pageNumbers = [];
@@ -20,7 +16,7 @@ const Pagination = ({
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = startPage + maxVisiblePages - 1;
 
-    // Adjust the start and end pages if they exceed total pages
+    // Adjust the start and end pages if they exceed the total pages
     if (endPage > totalPages) {
       endPage = totalPages;
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -36,7 +32,7 @@ const Pagination = ({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div
+    <Box
       style={{
         display: "flex",
         justifyContent: "center",
@@ -51,7 +47,7 @@ const Pagination = ({
         variant="outlined"
         style={{ margin: "0 4px" }}
       >
-        &lt; {/* Left Arrow */}
+        &lt; {/* {Left Arrow} */}
       </Button>
 
       {currentPage > 1 && pageNumbers[0] > 1 && (
@@ -77,6 +73,7 @@ const Pagination = ({
             padding: "8px 12px",
             cursor: "pointer",
             backgroundColor: currentPage === number ? "#007bff" : "#fff",
+
             color: currentPage === number ? "#fff" : "#007bff",
           }}
         >
@@ -108,7 +105,7 @@ const Pagination = ({
       >
         &gt; {/* Right Arrow */}
       </Button>
-    </div>
+    </Box>
   );
 };
 

@@ -1,6 +1,6 @@
 // hooks/useUsers.ts
 import { useQuery } from "@tanstack/react-query";
-import { fetchUserDetail, fetchUsers } from "../utils/api";
+import { fetchUserDetail, fetchUsers, fetchUsersByName } from "../utils/api";
 import { User } from "@/types";
 
 export const useUsers = (limit = 0, skip = 0, sortBy = "", order = "asc") => {
@@ -15,5 +15,14 @@ export const useUser = (id: number) => {
     queryKey: ["user", id],
     queryFn: () => fetchUserDetail(id),
     enabled: !!id,
+  });
+};
+
+// for client size user filtering
+export const useSearchUser = (name: string) => {
+  return useQuery<User[] | undefined>({
+    queryKey: ["user", name],
+    queryFn: () => fetchUsersByName(name),
+    enabled: !!name,
   });
 };

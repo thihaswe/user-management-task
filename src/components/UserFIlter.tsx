@@ -1,20 +1,17 @@
 import React, { useState } from "react";
-import { useUsers } from "../hooks/useUsers";
-
 import {
   Box,
   Button,
-  Input,
+  FormControl,
   InputLabel,
   MenuItem,
+  Menu,
   Select,
   TextField,
-  Typography,
 } from "@mui/material";
-import { Filter, User } from "@/types";
 import SearchIcon from "@mui/icons-material/Search";
-import Loading from "@/components/Loading";
-import { FormControl } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import { Filter } from "@/types";
 
 interface Prop {
   filter: Filter;
@@ -22,86 +19,125 @@ interface Prop {
   handleSearch: (para: React.FormEvent<HTMLFormElement>) => void;
 }
 
-const UserFIlter = ({ filter, setfilter, handleSearch }: Prop) => {
+const UserFilter = ({ filter, setfilter, handleSearch }: Prop) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
   return (
-    <form
-      onSubmit={handleSearch}
-      style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}
-    >
-      <FormControl variant="outlined" sx={{ minWidth: 200 }}>
-        <TextField
-          id="userlimit"
-          name="limit"
-          label="User Limit"
-          type="number"
-          defaultValue={filter.limit}
-          slotProps={{
-            htmlInput: {
-              min: 0,
-            },
-          }}
-          fullWidth
-        />
-      </FormControl>
-
-      <FormControl variant="outlined" sx={{ minWidth: 200 }}>
-        <TextField
-          id="skip"
-          name="skip"
-          label="Skip"
-          type="number"
-          defaultValue={filter.skip}
-          slotProps={{
-            htmlInput: {
-              min: 0,
-            },
-          }}
-          fullWidth
-        />
-      </FormControl>
-
-      <FormControl variant="outlined" sx={{ minWidth: 200 }}>
-        <InputLabel id="sortBy-label">Sort By</InputLabel>
-        <Select
-          labelId="sortBy-label"
-          id="sortBy"
-          name="sortBy"
-          defaultValue={filter.sortBy}
-          label="Sort By"
-        >
-          <MenuItem value="">Select Sort Option</MenuItem>
-          <MenuItem value="firstName">First Name</MenuItem>
-          <MenuItem value="lastName">Last Name</MenuItem>
-        </Select>
-      </FormControl>
-
-      <FormControl variant="outlined" sx={{ minWidth: 200 }}>
-        <InputLabel id="order-label">Order</InputLabel>
-        <Select
-          labelId="order-label"
-          id="order"
-          name="order"
-          defaultValue={filter.order}
-          label="Order"
-        >
-          <MenuItem value="asc">Ascending</MenuItem>
-          <MenuItem value="desc">Descending</MenuItem>
-        </Select>
-      </FormControl>
+    <Box>
       <Button
         variant="contained"
-        type="submit"
-        startIcon={<SearchIcon />}
-        sx={{
-          minWidth: 100,
-          height: "56px",
-          padding: "10px 20px",
-        }}
+        onClick={handleClick}
+        startIcon={<FilterListIcon />}
+        sx={{ mb: 2 }}
       >
-        Search
+        Filter
       </Button>
-    </form>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Box
+          component="form"
+          onSubmit={handleSearch}
+          sx={{
+            display: "flex",
+            gap: 2,
+            flexWrap: "wrap",
+            p: 2,
+            width: 300,
+          }}
+        >
+          <FormControl variant="outlined" sx={{ minWidth: 200 }}>
+            <TextField
+              id="userlimit"
+              name="limit"
+              label="User Limit"
+              type="number"
+              defaultValue={filter.limit}
+              slotProps={{
+                htmlInput: {
+                  min: 0,
+                },
+              }}
+              fullWidth
+            />
+          </FormControl>
+
+          <FormControl variant="outlined" sx={{ minWidth: 200 }}>
+            <TextField
+              id="skip"
+              name="skip"
+              label="Skip"
+              type="number"
+              defaultValue={filter.skip}
+              slotProps={{
+                htmlInput: {
+                  min: 0,
+                },
+              }}
+              fullWidth
+            />
+          </FormControl>
+
+          <FormControl variant="outlined" sx={{ minWidth: 200 }}>
+            <InputLabel id="sortBy-label">Sort By</InputLabel>
+            <Select
+              labelId="sortBy-label"
+              id="sortBy"
+              name="sortBy"
+              defaultValue={filter.sortBy}
+              label="Sort By"
+            >
+              <MenuItem value="">Select Sort Option</MenuItem>
+              <MenuItem value="firstName">First Name</MenuItem>
+              <MenuItem value="lastName">Last Name</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl variant="outlined" sx={{ minWidth: 200 }}>
+            <InputLabel id="order-label">Order</InputLabel>
+            <Select
+              labelId="order-label"
+              id="order"
+              name="order"
+              defaultValue={filter.order}
+              label="Order"
+            >
+              <MenuItem value="asc">Ascending</MenuItem>
+              <MenuItem value="desc">Descending</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Button
+            variant="contained"
+            type="submit"
+            startIcon={<SearchIcon />}
+            sx={{
+              minWidth: 100,
+              height: "56px",
+              padding: "10px 20px",
+            }}
+          >
+            Search
+          </Button>
+        </Box>
+      </Menu>
+    </Box>
   );
 };
 
-export default UserFIlter;
+export default UserFilter;

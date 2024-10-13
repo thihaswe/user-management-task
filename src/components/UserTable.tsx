@@ -8,14 +8,15 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
+
 import { useRouter } from "next/navigation";
 import { User } from "../types";
 
-interface UserTableProps {
+interface Prop {
   users: User[];
 }
 
-const UserTable: React.FC<UserTableProps> = ({ users }) => {
+const UserTable = ({ users }: Prop) => {
   const router = useRouter();
 
   const handleRowClick = (id: number) => {

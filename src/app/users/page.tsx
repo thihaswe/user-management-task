@@ -1,25 +1,18 @@
 "use client";
-import React, { useState } from "react";
-import { useUsers } from "../../hooks/useUsers";
-import UserTable from "../../components/UserTable";
-import Pagination from "../../components/Pagination";
-import {
-  Box,
-  Button,
-  Input,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
+import ErrorPage from "@/components/Error";
+import Loading from "@/components/Loading";
+import UserFIlter from "@/components/UserFIlter";
 import { Filter, User } from "@/types";
 import SearchIcon from "@mui/icons-material/Search";
-import Loading from "@/components/Loading";
-import { FormControl } from "@mui/material";
-import UserFIlter from "@/components/UserFIlter";
+import { Box, Input, InputAdornment, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import Pagination from "../../components/Pagination";
+import UserTable from "../../components/UserTable";
+import { useSearchUser, useUsers } from "../../hooks/useUsers";
 
 const UsersPage = () => {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setfilter] = useState<Filter>({
@@ -29,8 +22,11 @@ const UsersPage = () => {
     order: "",
   });
 
-  // Fetch users with the specified limit and skip
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
+  // Fetch users with the specified limit and skip
   const { limit, skip, sortBy, order } = filter;
   const { data, isLoading, isError, error } = useUsers(
     limit,
@@ -39,22 +35,34 @@ const UsersPage = () => {
     order
   );
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
+  // Fetch users by search term using the custom hook
+  const {
+    data: searchedUser,
+    isLoading: isLoadingSearch,
+    isError: isErrorSearch,
+    error: searchError,
+  } = useSearchUser(searchTerm);
 
-  // Filter users based on the search term
+  // {server-site user filter}
+  // const usersToDisplay: User[] = searchTerm
+  //   ? searchedUser && searchedUser.length > 0
+  //     ? [...searchedUser]
+  //     : []
+  //   : data || [];
+
+  /* client-site user filter*/
   const filteredUsers: User[] =
-    //@ts-ignore
     data?.filter((user: User) => {
       const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
       return fullName.includes(searchTerm.toLowerCase());
     }) || [];
 
-  // Calculate total pages based on filtered users
   const pageLimit = 10;
+  /* client-site user filter*/
   const totalFilteredPages = Math.ceil(filteredUsers.length / pageLimit);
+  // const totalFilteredPages = Math.ceil(usersToDisplay.length / pageLimit);
 
+  //filter the total users ??
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -70,30 +78,51 @@ const UsersPage = () => {
   };
 
   if (isLoading) return <Loading />;
-  if (isError)
-    return (
-      <Box>
-        <Box>{error.message}</Box>
-      </Box>
-    );
+  if ((isError && error) || (isErrorSearch && searchError))
+    return <ErrorPage message={error?.message || searchError?.message} />;
 
   return (
     <Box>
-      <Input
-        type="text"
-        placeholder="Search by name"
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-          setPage(1);
+      <Box
+        sx={{
+          display: "flex",
+          gap: 5,
+          alignItems: "center",
         }}
-        sx={{ marginBottom: "20px", padding: "8px", width: "300px" }}
-      />
-      <UserFIlter
-        filter={filter}
-        setfilter={setfilter}
-        handleSearch={handleSearch}
-      />
+      >
+        <Input
+          type="text"
+          placeholder="Search by name"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setPage(1);
+          }}
+          sx={{
+            marginBottom: "20px",
+            padding: "5px",
+            width: "300px",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            "& .MuiInputBase-input": {
+              paddingLeft: "8px",
+            },
+          }}
+          startAdornment={
+            <InputAdornment position="start">
+              <SearchIcon sx={{ color: "#888" }} />{" "}
+            </InputAdornment>
+          }
+        />
+
+        <UserFIlter
+          filter={filter}
+          setfilter={setfilter}
+          handleSearch={handleSearch}
+        />
+      </Box>
+
+      {/* client-site user filter*/}
       {filteredUsers.length > 0 ? (
         <>
           <UserTable
@@ -111,6 +140,27 @@ const UsersPage = () => {
       ) : (
         <Typography>No users found</Typography>
       )}
+
+      {/* {server site user filter} */}
+      {/* {usersToDisplay.length > 0 ? (
+        <>
+          <UserTable
+            users={usersToDisplay.slice(
+              (page - 1) * pageLimit,
+              page * pageLimit
+            )}
+          />
+          <Pagination
+            currentPage={page}
+            totalPages={totalFilteredPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      ) : isLoadingSearch ? (
+        <Loading />
+      ) : (
+        <Typography>No users found</Typography>
+      )} */}
     </Box>
   );
 };

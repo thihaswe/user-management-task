@@ -9,7 +9,7 @@ export const fetchUsers = async (
   order: string
 ) => {
   const response = await axios.get(
-    sortBy && order
+    sortBy
       ? `${BASE_URL}?limit=${limit}&skip=${skip}&sortBy=${sortBy}&order=${order}`
       : `${BASE_URL}?limit=${limit}&skip=${skip}`
   );
@@ -20,4 +20,10 @@ export const fetchUserDetail = async (id: number) => {
   const response = await axios.get(`${BASE_URL}/${id}`);
 
   return response.data;
+};
+
+// client size user filtering /
+export const fetchUsersByName = async (name: string) => {
+  const response = await axios.get(`${BASE_URL}/search?q=${name}`);
+  return response.data.users;
 };

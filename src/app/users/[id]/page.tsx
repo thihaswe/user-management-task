@@ -1,25 +1,9 @@
 "use client";
+import ErrorPage from "@/components/Error";
 import InfoCard from "@/components/InfoCard";
 import Loading from "@/components/Loading";
 import { useUser } from "@/hooks/useUsers";
-import { Address, Bank, Company, Coordinates, Crypto, User } from "@/types";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  Box,
-  Card,
-  CardContent,
-  Collapse,
-  Divider,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
@@ -37,6 +21,7 @@ const UserDetail: React.FC = () => {
     address: true,
     company: true,
     finance: true,
+    crypto: true,
   });
 
   const handleToggle = (section: string) => {
@@ -47,13 +32,7 @@ const UserDetail: React.FC = () => {
   };
 
   if (isLoading) return <Loading />;
-  if (isError)
-    return (
-      <Box>
-        404 not found:
-        {error.message}
-      </Box>
-    );
+  if (isError && error) return <ErrorPage message={error.message} />;
 
   if (data === undefined) {
     return <Box>no data found</Box>;
@@ -80,16 +59,26 @@ const UserDetail: React.FC = () => {
           />
 
           {/* personal information Section */}
-          {}
+          {rest && (
+            <InfoCard
+              prop={{
+                section: "biography",
+                handleToggle,
+                onOff: expandedSections.biography,
+                header: "Personal Information",
+                userInfo: rest,
+              }}
+            />
+          )}
           <Divider sx={{ my: 2 }} />
 
           {/* Address Section */}
           {address && (
             <InfoCard
               prop={{
-                handlePara: "address",
+                section: "address",
                 handleToggle,
-                section: expandedSections.address,
+                onOff: expandedSections.address,
                 header: "Address",
                 userInfo: address,
               }}
@@ -97,14 +86,14 @@ const UserDetail: React.FC = () => {
           )}
 
           <Divider sx={{ my: 2 }} />
-          {/* Company Section */}
 
+          {/* Company Section */}
           {company && (
             <InfoCard
               prop={{
-                handlePara: "company",
+                section: "company",
                 handleToggle,
-                section: expandedSections.company,
+                onOff: expandedSections.company,
                 header: "Company",
                 userInfo: company,
                 additional: company.address,
@@ -114,15 +103,27 @@ const UserDetail: React.FC = () => {
           <Divider sx={{ my: 2 }} />
 
           {/* Finance Section */}
-
           {bank && (
             <InfoCard
               prop={{
-                handlePara: "finance",
+                section: "finance",
                 handleToggle,
-                section: expandedSections.finance,
+                onOff: expandedSections.finance,
                 header: "Bank",
                 userInfo: bank,
+              }}
+            />
+          )}
+          <Divider sx={{ my: 2 }} />
+
+          {crypto && (
+            <InfoCard
+              prop={{
+                section: "crypto",
+                handleToggle,
+                onOff: expandedSections.crypto,
+                header: "Crypto",
+                userInfo: crypto,
               }}
             />
           )}

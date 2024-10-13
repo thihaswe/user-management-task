@@ -1,4 +1,3 @@
-// app/loading.tsx
 import { CircularProgress, Box, Typography } from "@mui/material";
 
 const Loading = () => {
