@@ -56,14 +56,14 @@ export const Sidebar = () => {
               <ListItemButton
                 sx={{
                   backgroundColor:
-                    pathname === route.path ? "grey" : "transparent",
+                    pathname === route.path ? "#1976D2" : "transparent",
 
                   "&:hover":
                     pathname !== route.path
                       ? {
-                          backgroundColor: "grey.300",
+                          backgroundColor: "#66B2FF",
                         }
-                      : { backgroundColor: "grey" },
+                      : { backgroundColor: "#1976D2" },
                 }}
               >
                 {React.cloneElement(route.icon, {

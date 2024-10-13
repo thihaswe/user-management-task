@@ -11,15 +11,14 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: Prop) => {
   // Determine the range of pages to display
   const getPageNumbers = () => {
     const pageNumbers = [];
-    const maxVisiblePages = 5;
 
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = startPage + maxVisiblePages - 1;
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = startPage + 4;
 
     // Adjust the start and end pages if they exceed the total pages
     if (endPage > totalPages) {
       endPage = totalPages;
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      startPage = endPage - 4;
     }
 
     for (let i = startPage; i <= endPage; i++) {
@@ -47,7 +46,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: Prop) => {
         variant="outlined"
         style={{ margin: "0 4px" }}
       >
-        &lt; {/* {Left Arrow} */}
+        {"<"}
       </Button>
 
       {currentPage > 1 && pageNumbers[0] > 1 && (
@@ -103,7 +102,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: Prop) => {
         variant="outlined"
         style={{ margin: "0 4px" }}
       >
-        &gt; {/* Right Arrow */}
+        {">"}
       </Button>
     </Box>
   );
