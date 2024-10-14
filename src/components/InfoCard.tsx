@@ -1,13 +1,8 @@
-import Loading from "@/components/Loading";
-import { useUser } from "@/hooks/useUsers";
-import { Address, Bank, Company, Coordinates, Crypto, User } from "@/types";
+import { Address, Bank, Company, Crypto, User } from "@/types";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Box,
-  Card,
-  CardContent,
   Collapse,
-  Divider,
   IconButton,
   Paper,
   Table,
@@ -18,9 +13,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import Image from "next/image";
-import { useParams } from "next/navigation";
-import React, { useState } from "react";
 
 interface Prop {
   handleToggle: (para: string) => void;
@@ -62,7 +54,7 @@ const InfoCard = ({ prop }: { prop: Prop }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* {main data like personal info,address,company,bank} */}
+              {/* {main data like personal info,address,company,bank,crypto} */}
               {Object.entries(userInfo).map(([key, value]) => {
                 if (typeof value !== "object" && value !== null) {
                   return (
