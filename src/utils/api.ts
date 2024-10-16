@@ -13,7 +13,7 @@ export const fetchUsers = async (
       ? `${BASE_URL}?limit=${limit}&skip=${skip}&sortBy=${sortBy}&order=${order}`
       : `${BASE_URL}?limit=${limit}&skip=${skip}`
   );
-  return response.data.users;
+  return response.data;
 };
 
 export const fetchUserDetail = async (id: number) => {

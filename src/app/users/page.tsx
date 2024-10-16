@@ -16,23 +16,24 @@ const UsersPage = () => {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setfilter] = useState<Filter>({
-    limit: 0,
+    limit: 10,
     skip: 0,
     sortBy: "",
-    order: "",
+    order: "asc",
   });
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
+    setfilter({ ...filter, limit: 10, skip: newPage * 10 - 10 });
   };
 
   // Fetch users with the specified limit and skip
-  const { limit, skip, sortBy, order } = filter;
+
   const { data, isLoading, isError, error } = useUsers(
-    limit,
-    skip,
-    sortBy,
-    order
+    filter.limit,
+    filter.skip,
+    filter.sortBy,
+    filter.order
   );
 
   // Fetch users by search term using the custom hook
@@ -43,24 +44,13 @@ const UsersPage = () => {
     error: searchError,
   } = useSearchUser(searchTerm);
 
-  // {server-site user filter}
-  // const usersToDisplay: User[] = searchTerm
-  //   ? searchedUser && searchedUser.length > 0
-  //     ? [...searchedUser]
-  //     : []
-  //   : data || [];
-
-  /* client-site user filter*/
-  const filteredUsers: User[] =
-    data?.filter((user: User) => {
-      const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-      return fullName.includes(searchTerm.toLowerCase());
-    }) || [];
-
-  const pageLimit = 10;
-  /* client-site user filter*/
-  const totalFilteredPages = Math.ceil(filteredUsers.length / pageLimit);
-  // const totalFilteredPages = Math.ceil(usersToDisplay.length / pageLimit);
+  // /* client-site user filter*/
+  // const filteredUsers: User[] =
+  //   //@ts-ignore
+  //   data?.users.filter((user: User) => {
+  //     const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+  //     return fullName.includes(searchTerm.toLowerCase());
+  //   }) || [];
 
   //filter the total users ??
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
@@ -81,49 +71,66 @@ const UsersPage = () => {
   if ((isError && error) || (isErrorSearch && searchError))
     return <ErrorPage message={error?.message || searchError?.message} />;
 
-  return (
-    <Box>
-      <Box
-        sx={{
-          display: "flex",
-          gap: 5,
-          alignItems: "center",
-        }}
-      >
-        <Input
-          type="text"
-          placeholder="Search by name"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setPage(1);
-          }}
+  if (data !== undefined) {
+    const usersToDisplay: User[] = searchTerm
+      ? searchedUser !== undefined && searchedUser.length > 0
+        ? searchedUser
+        : []
+      : data.users;
+
+    const pageLimit = 10;
+    /* client-site user filter*/
+    // const totalFilteredPages = data && Math.ceil(data.total / pageLimit);
+    const totalFilteredPages = searchedUser
+      ? Math.ceil(searchedUser.length / pageLimit)
+      : filter.limit > 10
+      ? //@ts-ignore
+        Math.ceil(data.users.length / pageLimit)
+      : Math.ceil(data.total / pageLimit);
+
+    return (
+      <Box>
+        <Box
           sx={{
-            marginBottom: "20px",
-            padding: "5px",
-            width: "300px",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            "& .MuiInputBase-input": {
-              paddingLeft: "8px",
-            },
+            display: "flex",
+            gap: 5,
+            alignItems: "center",
           }}
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon sx={{ color: "#888" }} />{" "}
-            </InputAdornment>
-          }
-        />
+        >
+          <Input
+            type="text"
+            placeholder="Search by name"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
+            sx={{
+              marginBottom: "20px",
+              padding: "5px",
+              width: "300px",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              "& .MuiInputBase-input": {
+                paddingLeft: "8px",
+              },
+            }}
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: "#888" }} />{" "}
+              </InputAdornment>
+            }
+          />
 
-        <UserFIlter
-          filter={filter}
-          setfilter={setfilter}
-          handleSearch={handleSearch}
-        />
-      </Box>
+          <UserFIlter
+            filter={filter}
+            setfilter={setfilter}
+            handleSearch={handleSearch}
+          />
+        </Box>
 
-      {/* client-site user filter*/}
-      {filteredUsers.length > 0 ? (
+        {/* client-site user filter*/}
+        {/* {filteredUsers.length > 0 ? (
         <>
           <UserTable
             users={filteredUsers.slice(
@@ -139,30 +146,32 @@ const UsersPage = () => {
         </>
       ) : (
         <Typography>No users found</Typography>
-      )}
-
-      {/* {server site user filter} */}
-      {/* {usersToDisplay.length > 0 ? (
-        <>
-          <UserTable
-            users={usersToDisplay.slice(
-              (page - 1) * pageLimit,
-              page * pageLimit
-            )}
-          />
-          <Pagination
-            currentPage={page}
-            totalPages={totalFilteredPages}
-            onPageChange={handlePageChange}
-          />
-        </>
-      ) : isLoadingSearch ? (
-        <Loading />
-      ) : (
-        <Typography>No users found</Typography>
       )} */}
-    </Box>
-  );
+
+        {/* {server site user filter} */}
+        {usersToDisplay.length > 0 ? (
+          <>
+            <UserTable
+              users={
+                filter.limit !== 10
+                  ? usersToDisplay.slice(page - 1 * 10, page * 10)
+                  : usersToDisplay
+              }
+            />
+            <Pagination
+              currentPage={page}
+              totalPages={totalFilteredPages}
+              onPageChange={handlePageChange}
+            />
+          </>
+        ) : isLoadingSearch ? (
+          <Loading />
+        ) : (
+          <Typography>No users found</Typography>
+        )}
+      </Box>
+    );
+  }
 };
 
 export default UsersPage;

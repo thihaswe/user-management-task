@@ -3,7 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchUserDetail, fetchUsers, fetchUsersByName } from "../utils/api";
 import { User } from "@/types";
 
-export const useUsers = (limit = 0, skip = 0, sortBy = "", order = "asc") => {
+export const useUsers = (
+  limit: number,
+  skip: number,
+  sortBy: string,
+  order: string
+) => {
   return useQuery<User[]>({
     queryKey: ["users", limit, skip, sortBy, order],
     queryFn: () => fetchUsers(limit, skip, sortBy, order),

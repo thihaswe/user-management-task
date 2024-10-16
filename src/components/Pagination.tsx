@@ -18,7 +18,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: Prop) => {
     // Adjust the start and end pages if they exceed the total pages
     if (endPage > totalPages) {
       endPage = totalPages;
-      startPage = endPage - 4;
+      startPage = Math.max(endPage - 4);
     }
 
     for (let i = startPage; i <= endPage; i++) {
