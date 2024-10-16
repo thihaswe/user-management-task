@@ -9,7 +9,7 @@ export const useUsers = (
   sortBy: string,
   order: string
 ) => {
-  return useQuery<User[]>({
+  return useQuery({
     queryKey: ["users", limit, skip, sortBy, order],
     queryFn: () => fetchUsers(limit, skip, sortBy, order),
   });

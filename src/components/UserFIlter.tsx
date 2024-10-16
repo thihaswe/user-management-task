@@ -14,12 +14,13 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { Filter } from "@/types";
 
 interface Prop {
-  filter: Filter;
+  filter: Filter | undefined;
   setfilter: (para: Filter) => void;
   handleSearch: (para: React.FormEvent<HTMLFormElement>) => void;
+  handleReset: () => void;
 }
 
-const UserFilter = ({ filter, setfilter, handleSearch }: Prop) => {
+const UserFilter = ({ filter, setfilter, handleSearch, handleReset }: Prop) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -55,43 +56,37 @@ const UserFilter = ({ filter, setfilter, handleSearch }: Prop) => {
           onSubmit={handleSearch}
           sx={{
             display: "flex",
+            flexDirection: "column",
             gap: 2,
-            flexWrap: "wrap",
             p: 2,
             width: 300,
           }}
         >
-          <FormControl variant="outlined" sx={{ minWidth: 200 }}>
-            <TextField
-              id="userlimit"
-              name="limit"
-              label="User Limit"
-              type="number"
-              defaultValue={filter.limit}
-              slotProps={{
-                htmlInput: {
-                  min: 0,
-                },
-              }}
-              fullWidth
-            />
-          </FormControl>
+          <TextField
+            id="userlimit"
+            name="limit"
+            label="User Limit"
+            type="number"
+            defaultValue={filter?.limit || 10}
+            inputProps={{
+              min: 0,
+            }}
+            fullWidth
+            variant="outlined"
+          />
 
-          <FormControl variant="outlined" sx={{ minWidth: 200 }}>
-            <TextField
-              id="skip"
-              name="skip"
-              label="Skip"
-              type="number"
-              defaultValue={filter.skip}
-              slotProps={{
-                htmlInput: {
-                  min: 0,
-                },
-              }}
-              fullWidth
-            />
-          </FormControl>
+          <TextField
+            id="skip"
+            name="skip"
+            label="Skip"
+            type="number"
+            defaultValue={filter?.skip || 0}
+            inputProps={{
+              min: 0,
+            }}
+            fullWidth
+            variant="outlined"
+          />
 
           <FormControl variant="outlined" sx={{ minWidth: 200 }}>
             <InputLabel id="sortBy-label">Sort By</InputLabel>
@@ -99,7 +94,7 @@ const UserFilter = ({ filter, setfilter, handleSearch }: Prop) => {
               labelId="sortBy-label"
               id="sortBy"
               name="sortBy"
-              defaultValue={filter.sortBy}
+              defaultValue={filter?.sortBy || ""}
               label="Sort By"
             >
               <MenuItem value="">Select Sort Option</MenuItem>
@@ -114,7 +109,7 @@ const UserFilter = ({ filter, setfilter, handleSearch }: Prop) => {
               labelId="order-label"
               id="order"
               name="order"
-              defaultValue={filter.order}
+              defaultValue={filter?.order || "asc"}
               label="Order"
             >
               <MenuItem value="asc">Ascending</MenuItem>
@@ -122,18 +117,32 @@ const UserFilter = ({ filter, setfilter, handleSearch }: Prop) => {
             </Select>
           </FormControl>
 
-          <Button
-            variant="contained"
-            type="submit"
-            startIcon={<SearchIcon />}
-            sx={{
-              minWidth: 100,
-              height: "56px",
-              padding: "10px 20px",
-            }}
-          >
-            Search
-          </Button>
+          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+            <Button
+              variant="contained"
+              type="submit"
+              startIcon={<SearchIcon />}
+              sx={{
+                minWidth: 100,
+                height: "56px",
+              }}
+            >
+              Search
+            </Button>
+            <Button
+              onClick={() => {
+                handleReset();
+                handleClose();
+              }}
+              variant="outlined"
+              sx={{
+                minWidth: 100,
+                height: "56px",
+              }}
+            >
+              Clear
+            </Button>
+          </Box>
         </Box>
       </Menu>
     </Box>
